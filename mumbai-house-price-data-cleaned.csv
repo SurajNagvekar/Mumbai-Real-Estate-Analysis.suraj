@@ -1,0 +1,68 @@
+DROP TABLE IF EXISTS housing;
+CREATE TABLE housing(
+    title TEXT,
+    price DOUBLE,
+    area DOUBLE,
+    price_per_sqft DOUBLE,
+    locality VARCHAR(255),
+    city VARCHAR(100),
+    property_type VARCHAR(100),
+    bedroom_num INT,
+    bathroom_num INT,
+    balcony_num INT,
+    furnished VARCHAR(50),
+    age VARCHAR(50),
+    total_floors INT,
+    latitude DOUBLE,
+    longitude DOUBLE
+);
+
+SET sql_mode = '';
+select * from housing limit 5;
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/mumbai-house-price-data-cleaned.csv'
+INTO TABLE housing
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;
+
+SELECT COUNT(*) FROM housing; -- to check everything --
+
+
+
+-- data cleaning--
+
+-- nulls--
+SELECT 
+  COUNT(*) AS total,
+  COUNT(price) AS price_not_null,
+  COUNT(area) AS area_not_null,
+  COUNT(locality) AS locality_not_null
+FROM housing;
+
+UPDATE housing 
+SET area = NULL 
+WHERE area = '' OR area = 'NA';
+
+UPDATE housing
+SET bedroom_num = NULL
+WHERE bedroom_num = 0;
+
+-- na is used for varchar text--
+UPDATE housing 
+SET locality = NULL 
+WHERE locality = '' OR locality = 'NA';
+
+delete from housing
+where locality is null;
+
+-- checking values--
+SELECT DISTINCT price
+FROM housing
+LIMIT 200;
+
+-- coverting invalid values to null-- 
+UPDATE housing 
+SET price = NULL 
+WHERE price = '' OR price LIKE '%Request%' OR price LIKE '%Call%';
+
